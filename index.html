@@ -1,38 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>HealthAI Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f9f9f9;
+    }
+    textarea {
+      width: 100%;
+      max-width: 400px;
+      height: 100px;
+      padding: 10px;
+      font-size: 14px;
+      resize: vertical;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #333;
+      max-width: 400px;
+    }
+  </style>
 </head>
 <body>
-  <h2>💊 HealthAI Assistant</h2>
-  <textarea id="symptoms" placeholder="Enter symptoms..."></textarea><br>
+  <h1>💊 HealthAI Assistant</h1>
+  <textarea id="symptom" placeholder="Describe your symptoms..."></textarea><br>
   <button onclick="getSuggestion()">Get Suggestion</button>
-  <div id="result"></div>
+  <p id="result"></p>
 
   <script>
-    const API_URL = "http://127.0.0.1:8000/suggest";  // Use your Replit URL if deployed
-
     async function getSuggestion() {
-      const symptoms = document.getElementById("symptoms").value;
-      const result = document.getElementById("result");
-      result.innerText = "⏳ Loading...";
+      const symptomText = document.getElementById("symptom").value;
+      const resultEl = document.getElementById("result");
 
       try {
-        const res = await fetch(API_URL, {
+        const response = await fetch("https://21697d11-5c5b-43af-91d0-012fc2bd71a4-00-26hf6lpg9fml8.sisko.replit.dev/suggest", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ symptoms })
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ symptoms: symptomText })
         });
-        const data = await res.json();
-        result.innerHTML = data.disease_detected ?
-          `🧠 Disease: ${data.disease_detected}<br>💊 Medicines: ${data.suggested_medicines.join(", ")}<br>⚠️ ${data.disclaimer}` :
-          data.message;
-      } catch {
-        result.innerText = "❌ Could not contact server.";
+
+        if (!response.ok) throw new Error("Server error");
+
+        const data = await response.json();
+        resultEl.textContent = "💡 " + data.suggestion;
+      } catch (error) {
+        resultEl.textContent = "❌ Could not contact server.";
+        console.error("Fetch error:", error);
       }
     }
   </script>
 </body>
 </html>
-
