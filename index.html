@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>HealthAI Assistant</title>
+</head>
+<body>
+  <h2>💊 HealthAI Assistant</h2>
+  <textarea id="symptoms" placeholder="Enter symptoms..."></textarea><br>
+  <button onclick="getSuggestion()">Get Suggestion</button>
+  <div id="result"></div>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000/suggest";  // Use your Replit URL if deployed
+
+    async function getSuggestion() {
+      const symptoms = document.getElementById("symptoms").value;
+      const result = document.getElementById("result");
+      result.innerText = "⏳ Loading...";
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ symptoms })
+        });
+        const data = await res.json();
+        result.innerHTML = data.disease_detected ?
+          `🧠 Disease: ${data.disease_detected}<br>💊 Medicines: ${data.suggested_medicines.join(", ")}<br>⚠️ ${data.disclaimer}` :
+          data.message;
+      } catch {
+        result.innerText = "❌ Could not contact server.";
+      }
+    }
+  </script>
+</body>
+</html>
+
